@@ -1869,6 +1869,444 @@ body {
     margin-top: -7px;
 }
 
+/* ===== TIMELINE TYPE BADGE ===== */
+.timeline-type-badge {
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    color: var(--type-grass);
+    background: rgba(120, 200, 80, 0.12);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    margin-left: var(--space-sm);
+    vertical-align: middle;
+}
+
+/* ===== EDUCATION / POKÉMON ACADEMY ===== */
+.education-section {
+    position: relative;
+}
+
+.education-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-xl);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.edu-card {
+    padding: var(--space-xl);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    border: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.edu-card:hover {
+    border-color: rgba(248, 208, 48, 0.3);
+    box-shadow: 0 0 30px rgba(248, 208, 48, 0.1);
+}
+
+.edu-pokemon-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+}
+
+.edu-pokemon {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 15px rgba(248, 208, 48, 0.25));
+}
+
+.edu-ribbon {
+    text-align: center;
+    margin-bottom: var(--space-md);
+}
+
+.edu-period {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--type-electric);
+    background: rgba(248, 208, 48, 0.1);
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+}
+
+.edu-degree {
+    font-family: var(--font-pixel);
+    font-size: 0.65rem;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.6;
+    text-align: center;
+}
+
+.edu-institution {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--type-fire);
+    text-align: center;
+    margin-bottom: var(--space-md);
+}
+
+.edu-score-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.edu-score-label {
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    color: var(--text-muted);
+    min-width: 35px;
+}
+
+.edu-score-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.edu-score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--type-electric), var(--type-fire));
+    border-radius: var(--radius-full);
+    box-shadow: 0 0 10px rgba(248, 208, 48, 0.4);
+}
+
+.edu-score-value {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--type-electric);
+    min-width: 40px;
+    text-align: right;
+}
+
+.edu-dissertation {
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--type-psychic);
+}
+
+.edu-diss-label {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--type-psychic);
+    display: block;
+    margin-bottom: var(--space-sm);
+}
+
+.edu-dissertation p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ===== CERTIFICATIONS / BADGE COLLECTION ===== */
+.certifications-section {
+    position: relative;
+}
+
+.cert-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.cert-badge-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: all var(--transition-normal);
+    cursor: default;
+}
+
+.cert-badge-card.fire {
+    border-color: rgba(240, 128, 48, 0.2);
+}
+
+.cert-badge-card.water {
+    border-color: rgba(104, 144, 240, 0.2);
+}
+
+.cert-badge-card.grass {
+    border-color: rgba(120, 200, 80, 0.2);
+}
+
+.cert-badge-card.electric {
+    border-color: rgba(248, 208, 48, 0.2);
+}
+
+.cert-badge-card.psychic {
+    border-color: rgba(248, 88, 136, 0.2);
+}
+
+.cert-badge-card.dragon {
+    border-color: rgba(112, 56, 248, 0.2);
+}
+
+.cert-badge-card.normal {
+    border-color: rgba(168, 168, 120, 0.2);
+}
+
+.cert-badge-card:hover {
+    transform: translateY(-6px);
+}
+
+.cert-badge-card.fire:hover {
+    border-color: var(--type-fire);
+    box-shadow: var(--shadow-glow-fire);
+}
+
+.cert-badge-card.water:hover {
+    border-color: var(--type-water);
+    box-shadow: var(--shadow-glow-water);
+}
+
+.cert-badge-card.grass:hover {
+    border-color: var(--type-grass);
+    box-shadow: var(--shadow-glow-grass);
+}
+
+.cert-badge-card.electric:hover {
+    border-color: var(--type-electric);
+    box-shadow: var(--shadow-glow-electric);
+}
+
+.cert-badge-card.psychic:hover {
+    border-color: var(--type-psychic);
+    box-shadow: var(--shadow-glow-psychic);
+}
+
+.cert-badge-card.dragon:hover {
+    border-color: var(--type-dragon);
+    box-shadow: var(--shadow-glow-dragon);
+}
+
+.cert-badge-card.normal:hover {
+    border-color: var(--type-normal);
+    box-shadow: 0 0 20px rgba(168, 168, 120, 0.3);
+}
+
+.cert-icon {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+}
+
+.cert-glow-ring {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.cert-type-emoji {
+    font-size: 2rem;
+    margin-bottom: var(--space-md);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.cert-name {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.8;
+}
+
+.cert-issuer {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-sm);
+}
+
+.cert-date {
+    font-family: var(--font-pixel);
+    font-size: 0.4rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: var(--space-sm);
+}
+
+.cert-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin-top: var(--space-sm);
+}
+
+/* ===== PUBLICATIONS / RESEARCH LOG ===== */
+.publications-section {
+    position: relative;
+}
+
+.pub-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.pub-card {
+    display: flex;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    border: 2px solid rgba(112, 56, 248, 0.15);
+    transition: all var(--transition-normal);
+    align-items: flex-start;
+}
+
+.pub-card:hover {
+    border-color: rgba(112, 56, 248, 0.4);
+}
+
+.pub-pokemon-wrap {
+    flex-shrink: 0;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pub-pokemon {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(112, 56, 248, 0.25));
+}
+
+.pub-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.pub-type-label {
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    display: block;
+    margin-bottom: var(--space-sm);
+    letter-spacing: 0.5px;
+}
+
+.pub-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
+}
+
+.pub-authors {
+    font-size: 0.85rem;
+    color: var(--type-electric);
+    margin-bottom: var(--space-xs);
+    font-weight: 500;
+}
+
+.pub-journal {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-sm);
+}
+
+.pub-meta {
+    display: flex;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.pub-date,
+.pub-isbn {
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+}
+
+/* ===== ACHIEVEMENTS / HALL OF FAME ===== */
+.achievements-section {
+    position: relative;
+}
+
+.achieve-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.achieve-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--achieve-color, var(--type-electric));
+    transition: all var(--transition-normal);
+}
+
+.achieve-card:hover {
+    box-shadow: 0 0 25px color-mix(in srgb, var(--achieve-color, var(--type-electric)) 25%, transparent);
+    border-left-width: 6px;
+}
+
+.achieve-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.achieve-text {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-family: var(--font-display);
+}
+
+.achieve-sparkle {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+}
+
+.sparkle-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--achieve-color, var(--type-electric));
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .section {
@@ -1936,6 +2374,32 @@ body {
     .rpg-textbox {
         padding: var(--space-md);
     }
+
+    .education-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cert-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pub-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .pub-pokemon-wrap {
+        width: auto;
+    }
+
+    .pub-meta {
+        justify-content: center;
+    }
+
+    .achieve-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1961,5 +2425,17 @@ body {
 
     .footer-text {
         font-size: 0.45rem;
+    }
+
+    .cert-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .edu-card {
+        padding: var(--space-lg);
+    }
+
+    .pub-card {
+        padding: var(--space-lg);
     }
 }

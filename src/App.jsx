@@ -4,6 +4,10 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
+import Education from './components/Education';
+import Certifications from './components/Certifications';
+import Publications from './components/Publications';
+import Achievements from './components/Achievements';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import FloatingPokemon from './components/FloatingPokemon';
@@ -27,6 +31,14 @@ export default function App() {
                 <Projects />
                 <SectionDivider />
                 <Experience />
+                <SectionDivider />
+                <Education />
+                <SectionDivider />
+                <Publications />
+                <SectionDivider />
+                <Certifications />
+                <SectionDivider />
+                <Achievements />
                 <SectionDivider />
                 <Contact />
             </main>

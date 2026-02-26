@@ -16,6 +16,7 @@ const pokemonSprites = {
     lucario: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png',
     raichu: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png',
     eevee: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png',
+    alakazam: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png',
 };
 
 export default function Experience() {
@@ -68,6 +69,7 @@ export default function Experience() {
                             </div>
 
                             <span className="timeline-period">{exp.period}</span>
+                            {exp.type && <span className="timeline-type-badge">{exp.type}</span>}
                             <h3 className="timeline-role">{exp.role}</h3>
                             <p className="timeline-company">{exp.company}</p>
                             <p className="timeline-desc">{exp.description}</p>
