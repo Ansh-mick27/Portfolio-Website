@@ -141,16 +141,6 @@ export default function Hero() {
                 </motion.div>
             </motion.div>
 
-            {/* Scroll Indicator */}
-            <motion.div
-                className="scroll-indicator"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 2 }}
-            >
-                <span>SCROLL DOWN</span>
-                <div className="scroll-pokeball" />
-            </motion.div>
         </section>
     );
 }

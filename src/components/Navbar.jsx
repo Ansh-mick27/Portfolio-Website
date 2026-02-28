@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSounds } from './SoundManager';
+import ThemeToggle from './ThemeToggle';
+import { FiVolume2, FiVolumeX } from 'react-icons/fi';
 
 const navItems = [
     { label: "Home", to: "hero" },
@@ -18,12 +21,12 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
+    const { muted, toggleMute, playSound } = useSounds();
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50);
 
-            // Detect active section
             const sections = navItems.map(item => document.getElementById(item.to));
             let current = 'hero';
             sections.forEach(section => {
@@ -42,6 +45,7 @@ export default function Navbar() {
     }, []);
 
     const scrollTo = (id) => {
+        playSound('click');
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
         setMenuOpen(false);
     };
@@ -66,12 +70,30 @@ export default function Navbar() {
                                 <a
                                     className={activeSection === item.to ? 'active' : ''}
                                     onClick={() => scrollTo(item.to)}
+                                    onMouseEnter={() => playSound('hover')}
                                 >
                                     {item.label}
                                 </a>
                             </li>
                         ))}
                     </ul>
+
+                    <div className="navbar-controls">
+                        {/* Sound Toggle */}
+                        <motion.button
+                            className="sound-toggle"
+                            onClick={toggleMute}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            title={muted ? 'Unmute sounds' : 'Mute sounds'}
+                            aria-label={muted ? 'Unmute sounds' : 'Mute sounds'}
+                        >
+                            {muted ? <FiVolumeX /> : <FiVolume2 />}
+                        </motion.button>
+
+                        {/* Theme Toggle */}
+                        <ThemeToggle />
+                    </div>
 
                     <button
                         className={`hamburger ${menuOpen ? 'open' : ''}`}
@@ -106,6 +128,19 @@ export default function Navbar() {
                                 {item.label}
                             </motion.a>
                         ))}
+
+                        <div className="mobile-menu-controls">
+                            <motion.button
+                                className="sound-toggle"
+                                onClick={toggleMute}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                {muted ? <FiVolumeX /> : <FiVolume2 />}
+                                <span>{muted ? 'Sound Off' : 'Sound On'}</span>
+                            </motion.button>
+                            <ThemeToggle />
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
