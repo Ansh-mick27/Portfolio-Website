@@ -123,6 +123,8 @@ export default function EggHatchEasterEgg() {
                             <motion.img
                                 src={hatchedPokemon?.sprite}
                                 alt={hatchedPokemon?.name}
+                                loading="lazy"
+                                decoding="async"
                                 className="hatched-pokemon"
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}

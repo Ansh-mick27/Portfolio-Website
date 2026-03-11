@@ -124,6 +124,8 @@ function FloatingPokemon() {
                     <motion.img
                         src={p.src}
                         alt={p.name}
+                        loading="lazy"
+                        decoding="async"
                         className={`floating-pokemon ${p.isShiny ? 'shiny-pokemon' : ''}`}
                         style={{
                             width: p.size,

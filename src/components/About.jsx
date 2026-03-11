@@ -52,6 +52,8 @@ export default function About() {
                                     <motion.img
                                         src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png"
                                         alt="Lucario - Developer Avatar"
+                                        loading="lazy"
+                                        decoding="async"
                                         style={{
                                             width: '75%',
                                             height: '75%',

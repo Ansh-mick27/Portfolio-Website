@@ -50,7 +50,9 @@ export default function Contact() {
                         <div className="contact-pc-header">
                             <motion.img
                                 src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/18.png"
-                                alt="Pidgeot"
+                                alt="Pidgeot Developer"
+                                loading="lazy"
+                                decoding="async"
                                 style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                                 animate={{ x: [0, 5, 0], rotate: [0, 3, 0] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -141,6 +143,7 @@ export default function Contact() {
                                     rel="noopener noreferrer"
                                     className="social-pokeball"
                                     title={link.name}
+                                    aria-label={`Visit my ${link.name} profile`}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                                     transition={{ delay: 0.5 + i * 0.1 }}

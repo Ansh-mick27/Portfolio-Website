@@ -99,8 +99,9 @@ export default function Projects() {
                                         rel="noopener noreferrer"
                                         className="github-link"
                                         onClick={e => e.stopPropagation()}
+                                        aria-label={`View ${project.name} source code on GitHub`}
                                     >
-                                        <FiGithub /> GitHub
+                                        <FiGithub aria-hidden="true" /> GitHub
                                     </a>
                                     {project.live && (
                                         <a
@@ -109,8 +110,9 @@ export default function Projects() {
                                             rel="noopener noreferrer"
                                             className="live-link"
                                             onClick={e => e.stopPropagation()}
+                                            aria-label={`View live demo of ${project.name}`}
                                         >
-                                            <FiExternalLink /> Live Demo
+                                            <FiExternalLink aria-hidden="true" /> Live Demo
                                         </a>
                                     )}
                                 </div>

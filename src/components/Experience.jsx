@@ -62,6 +62,8 @@ export default function Experience() {
                                 <motion.img
                                     src={pokemonSprites[exp.pokemon]}
                                     alt={exp.pokemon}
+                                    loading="lazy"
+                                    decoding="async"
                                     style={{ width: '45px', height: '45px', objectFit: 'contain' }}
                                     animate={{ y: [0, -5, 0] }}
                                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}

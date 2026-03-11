@@ -99,6 +99,8 @@ export default function ProfessorOakModal() {
                             <motion.img
                                 src={oakImage}
                                 alt="Professor Oak"
+                                loading="lazy"
+                                decoding="async"
                                 className="oak-sprite"
                                 animate={{ y: [0, -8, 0] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}

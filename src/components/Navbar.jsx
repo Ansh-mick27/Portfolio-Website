@@ -59,7 +59,7 @@ export default function Navbar() {
                 transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
             >
                 <div className="navbar-content">
-                    <a className="navbar-logo" onClick={() => scrollTo('hero')} style={{ cursor: 'pointer' }}>
+                    <a className="navbar-logo" onClick={() => scrollTo('hero')} style={{ cursor: 'pointer' }} aria-label="Scroll to home">
                         <div className="pokeball-icon" />
                         <span>ANSHUL</span>
                     </a>
