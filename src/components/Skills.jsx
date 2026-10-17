@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { skills } from '../data/portfolio';
+import SkillSphere from './fx/SkillSphere';
+import Tilt from './fx/Tilt';
 
 const pokemonSprites = {
     charizard: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
@@ -23,16 +25,26 @@ export default function Skills() {
                 <span>⚡ Type Matchup Chart</span>
             </motion.h2>
 
+            <motion.div
+                initial={{ opacity: 0, scale: 0.6, rotateY: -60 }}
+                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformPerspective: 1200 }}
+            >
+                <SkillSphere groups={skills} />
+            </motion.div>
+
             <div className="skills-grid">
                 {skills.map((category, i) => (
+                    <Tilt key={category.type} max={14} className="tilt-skill">
                     <motion.div
-                        key={category.type}
                         className={`skill-card ${category.type}`}
-                        initial={{ opacity: 0, y: 50, rotateX: -10 }}
-                        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                        initial={{ opacity: 0, y: 70, rotateX: -45, z: -120 }}
+                        whileInView={{ opacity: 1, y: 0, rotateX: 0, z: 0 }}
+                        style={{ transformPerspective: 1000 }}
                         viewport={{ once: true, margin: '-50px' }}
                         transition={{ delay: i * 0.12, duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                        whileHover={{ scale: 1.03 }}
                     >
                         <div className="skill-card-header">
                             <motion.img
@@ -63,6 +75,7 @@ export default function Skills() {
                             ))}
                         </ul>
                     </motion.div>
+                    </Tilt>
                 ))}
             </div>
         </section>

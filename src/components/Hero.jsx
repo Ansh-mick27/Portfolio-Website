@@ -1,27 +1,38 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion';
 import { personalInfo } from '../data/portfolio';
+import useMagnetic from './fx/useMagnetic';
 
-// Pokémon sprites mapped — using PokeAPI sprite URLs
-const pokemonSprites = {
-    charizard: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png',
-    gengar: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png',
-    mewtwo: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png',
-    lucario: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png',
-    eevee: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png',
-    dragonite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png',
-    gyarados: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png',
-    pikachu: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
-    rayquaza: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/384.png',
-    umbreon: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png',
-};
-
-const heroPokemons = ['charizard', 'gengar', 'dragonite', 'mewtwo', 'lucario', 'eevee', 'pikachu', 'rayquaza'];
+function SplitName({ text }) {
+    return (
+        <h1 className="hero-name split" aria-label={text}>
+            {text.split(' ').map((word, w) => (
+                <span key={w} className="hero-word" aria-hidden="true">
+                    {word.split('').map((ch, i) => (
+                        <motion.span
+                            key={i}
+                            className="hero-letter"
+                            style={{ '--i': w * 6 + i }}
+                            initial={{ rotateX: -95, y: 40, opacity: 0, z: -80 }}
+                            animate={{ rotateX: 0, y: 0, opacity: 1, z: 0 }}
+                            transition={{ delay: 0.35 + (w * 6 + i) * 0.055, duration: 0.9, ease: [0.22, 1.2, 0.36, 1] }}
+                            whileHover={{ y: -10, rotateY: 25, scale: 1.15, transition: { duration: 0.25 } }}
+                        >
+                            {ch}
+                        </motion.span>
+                    ))}
+                </span>
+            ))}
+        </h1>
+    );
+}
 
 export default function Hero() {
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayText, setDisplayText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
+    const primaryBtn = useMagnetic(0.3);
+    const secondaryBtn = useMagnetic(0.3);
 
     // Typing effect
     useEffect(() => {
@@ -43,104 +54,97 @@ export default function Hero() {
         return () => clearTimeout(timeout);
     }, [displayText, isDeleting, roleIndex]);
 
-    // Generate random positions for floating Pokémon in hero
-    const pokemonPositions = useMemo(() => {
-        return heroPokemons.map((name, i) => ({
-            name,
-            src: pokemonSprites[name],
-            left: `${5 + (i * 12) % 90}%`,
-            top: `${10 + ((i * 17 + 5) % 75)}%`,
-            size: 60 + (i % 3) * 30,
-            delay: i * 0.8,
-            duration: 5 + (i % 4) * 2,
-            opacity: 0.08 + (i % 3) * 0.04,
-        }));
-    }, []);
+    // Whole hero block tilts gently in 3D with the mouse
+    const mx = useMotionValue(0);
+    const my = useMotionValue(0);
+    const rx = useSpring(useTransform(my, [-1, 1], [7, -7]), { stiffness: 120, damping: 18 });
+    const ry = useSpring(useTransform(mx, [-1, 1], [-9, 9]), { stiffness: 120, damping: 18 });
+
+    // Scroll away: content sinks back into 3D space
+    const { scrollY } = useScroll();
+    const sinkZ = useTransform(scrollY, [0, 700], [0, -260]);
+    const sinkRot = useTransform(scrollY, [0, 700], [0, 22]);
+    const sinkOpacity = useTransform(scrollY, [0, 550], [1, 0]);
+
+    const onMove = (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        mx.set(((e.clientX - r.left) / r.width) * 2 - 1);
+        my.set(((e.clientY - r.top) / r.height) * 2 - 1);
+    };
 
     const stagger = {
         hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
+        visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.9 } },
     };
 
     const fadeUp = {
-        hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.34, 1.56, 0.64, 1] } }
+        hidden: { opacity: 0, y: 40, rotateX: -30 },
+        visible: { opacity: 1, y: 0, rotateX: 0, transition: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] } },
     };
 
     return (
-        <section className="hero" id="hero">
-            {/* Starry background */}
+        <section
+            className="hero"
+            id="hero"
+            onPointerMove={onMove}
+            onPointerLeave={() => {
+                mx.set(0);
+                my.set(0);
+            }}
+        >
             <div className="hero-bg">
                 <div className="stars" />
-
-                {/* Floating Pokémon in Hero */}
-                {pokemonPositions.map((p, i) => (
-                    <motion.img
-                        key={i}
-                        src={p.src}
-                        alt={p.name}
-                        style={{
-                            position: 'absolute',
-                            left: p.left,
-                            top: p.top,
-                            width: p.size,
-                            height: p.size,
-                            opacity: p.opacity,
-                            filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.1))',
-                            pointerEvents: 'none',
-                            objectFit: 'contain',
-                        }}
-                        animate={{
-                            y: [0, -25, 0],
-                            x: [0, 10, -10, 0],
-                            rotate: [0, 3, -3, 0],
-                        }}
-                        transition={{
-                            duration: p.duration,
-                            repeat: Infinity,
-                            delay: p.delay,
-                            ease: 'easeInOut',
-                        }}
-                    />
-                ))}
             </div>
 
-            {/* Hero Content */}
-            <motion.div
-                className="hero-content"
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-            >
-                <motion.p className="battle-intro" variants={fadeUp}>
-                    ⚔️ A wild developer appeared!
-                </motion.p>
+            <motion.div className="hero-stage" style={{ z: sinkZ, rotateX: sinkRot, opacity: sinkOpacity }}>
+                <motion.div className="hero-content" style={{ rotateX: rx, rotateY: ry }}>
+                    <motion.p
+                        className="battle-intro"
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 0.9, x: 0 }}
+                        transition={{ delay: 0.15, duration: 0.6 }}
+                    >
+                        ⚔️ A wild developer appeared!
+                    </motion.p>
 
-                <motion.h1 className="hero-name" variants={fadeUp}>
-                    {personalInfo.name}
-                </motion.h1>
+                    <SplitName text={personalInfo.name} />
 
-                <motion.div className="hero-role" variants={fadeUp}>
-                    {'> '}{displayText}<span className="cursor">_</span>
-                </motion.div>
+                    <motion.div variants={stagger} initial="hidden" animate="visible" className="hero-rest">
+                        <motion.div className="hero-role" variants={fadeUp}>
+                            {'> '}
+                            {displayText}
+                            <span className="cursor">_</span>
+                        </motion.div>
 
-                <motion.div className="rpg-textbox" variants={fadeUp}>
-                    <p>{personalInfo.bio}</p>
-                </motion.div>
+                        <motion.div className="rpg-textbox" variants={fadeUp}>
+                            <p>{personalInfo.bio}</p>
+                        </motion.div>
 
-                <motion.div className="hero-buttons" variants={fadeUp}>
-                    <a className="pokeball-btn" href="#projects">
-                        🎴 View Projects
-                    </a>
-                    <a className="pokeball-btn secondary" href="#contact">
-                        📬 Contact Me
-                    </a>
+                        <motion.div className="hero-buttons" variants={fadeUp}>
+                            <a ref={primaryBtn} className="pokeball-btn magnetic" href="#projects">
+                                🎴 View Projects
+                            </a>
+                            <a ref={secondaryBtn} className="pokeball-btn secondary magnetic" href="#contact">
+                                📬 Contact Me
+                            </a>
+                        </motion.div>
+                    </motion.div>
                 </motion.div>
             </motion.div>
 
+            <motion.a
+                href="#about"
+                className="scroll-cue"
+                aria-label="Scroll down"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2.4 }}
+            >
+                <span className="scroll-cue-mouse">
+                    <span className="scroll-cue-wheel" />
+                </span>
+                <span className="scroll-cue-label">Scroll</span>
+            </motion.a>
         </section>
     );
 }

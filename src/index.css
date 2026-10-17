@@ -3090,3 +3090,457 @@ nav,
         min-height: 80px;
     }
 }
+/* ============================================================
+   3D UPGRADE — WebGL scene, tilt cards, skill globe, cursor
+   ============================================================ */
+
+/* ----- Fixed WebGL background ----- */
+.scene3d {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    animation: scene-in 1.6s ease-out both;
+}
+
+.scene3d canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@keyframes scene-in {
+    from { opacity: 0; transform: scale(1.08); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+main,
+.footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* Cards get a touch more glass so text stays readable over the 3D scene */
+.glass-card,
+.skill-card,
+.timeline-content,
+.project-card-front,
+.project-card-back {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* ----- Hero: split layout, 3D stage ----- */
+.hero {
+    perspective: 1200px;
+}
+
+.hero-stage {
+    width: 100%;
+    max-width: 1200px;
+    position: relative;
+    z-index: 10;
+    transform-style: preserve-3d;
+}
+
+.hero-stage .hero-content {
+    text-align: left;
+    max-width: 640px;
+    transform-style: preserve-3d;
+}
+
+.hero-stage .rpg-textbox {
+    margin-left: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.hero-stage .hero-buttons {
+    justify-content: flex-start;
+}
+
+.hero-name.split {
+    background: none;
+    -webkit-text-fill-color: initial;
+    animation: none;
+    perspective: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.55em;
+}
+
+.hero-word {
+    display: inline-flex;
+    transform-style: preserve-3d;
+}
+
+.hero-letter {
+    display: inline-block;
+    transform-origin: 50% 100%;
+    background: linear-gradient(135deg, var(--type-electric), var(--type-fire), var(--type-psychic), var(--type-electric));
+    background-size: 400% 100%;
+    background-position: calc(var(--i) * 9%) 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: letter-shimmer 6s linear infinite;
+    animation-delay: calc(var(--i) * -0.25s);
+    filter: drop-shadow(0 6px 18px rgba(248, 208, 48, 0.25));
+    cursor: default;
+}
+
+@keyframes letter-shimmer {
+    to { background-position: calc(var(--i) * 9% + 400%) 50%; }
+}
+
+.pokeball-btn.magnetic {
+    transition: transform 0.25s var(--ease-smooth), box-shadow var(--transition-normal), background var(--transition-normal);
+    will-change: transform;
+}
+
+.scroll-cue {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    translate: -50% 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 2px;
+}
+
+.scroll-cue-mouse {
+    width: 22px;
+    height: 34px;
+    border: 2px solid var(--text-muted);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    padding-top: 6px;
+}
+
+.scroll-cue-wheel {
+    width: 3px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--type-electric);
+    animation: wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes wheel {
+    0% { transform: translateY(0); opacity: 1; }
+    80% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .hero-stage .hero-content {
+        text-align: center;
+        margin: 0 auto;
+        padding-top: 200px; /* room for the 3D core above the text */
+    }
+    .hero-name.split {
+        justify-content: center;
+    }
+    .hero-stage .rpg-textbox {
+        margin-left: auto;
+    }
+    .hero-stage .hero-buttons {
+        justify-content: center;
+    }
+}
+
+/* ----- Tilt wrapper ----- */
+.tilt {
+    position: relative;
+    transform: perspective(1000px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg)) scale(var(--tilt-s, 1));
+    transition: transform 0.45s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+    transform-style: preserve-3d;
+    will-change: transform;
+    border-radius: var(--radius-lg);
+}
+
+.tilt-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 6;
+    opacity: var(--glare-o, 0);
+    transition: opacity 0.4s ease;
+    background: radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.06) 35%, transparent 60%);
+    mix-blend-mode: overlay;
+}
+
+.tilt-skill {
+    height: 100%;
+}
+
+.tilt-skill > .skill-card {
+    height: 100%;
+}
+
+.tilt .parallax-sprite {
+    translate: calc(var(--px, 0) * -22px) calc(var(--py, 0) * -22px);
+    transition: translate 0.3s ease-out;
+}
+
+/* ----- Project cards: type-coloured holo edges ----- */
+.project-card-front { --card-accent: var(--type-electric); }
+.project-card-front.type-fire { --card-accent: var(--type-fire); }
+.project-card-front.type-water { --card-accent: var(--type-water); }
+.project-card-front.type-grass { --card-accent: var(--type-grass); }
+.project-card-front.type-electric { --card-accent: var(--type-electric); }
+.project-card-front.type-psychic { --card-accent: var(--type-psychic); }
+.project-card-front.type-dragon { --card-accent: var(--type-dragon); }
+.project-card-front.type-ghost { --card-accent: var(--type-ghost); }
+
+.project-card-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(from var(--holo-angle, 0deg), transparent 0deg, var(--card-accent) 60deg, transparent 120deg, transparent 240deg, var(--card-accent) 300deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.project-card:hover .project-card-front::after,
+.project-card:focus-visible .project-card-front::after {
+    opacity: 1;
+    animation: holo-spin 3s linear infinite;
+}
+
+@property --holo-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes holo-spin {
+    to { --holo-angle: 360deg; }
+}
+
+.project-card:hover .project-card-front {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 35px color-mix(in srgb, var(--card-accent) 35%, transparent);
+}
+
+.project-card:focus-visible {
+    outline: 2px solid var(--type-electric);
+    outline-offset: 4px;
+    border-radius: var(--radius-lg);
+}
+
+.card-ribbon {
+    position: absolute;
+    top: 14px;
+    left: -34px;
+    transform: rotate(-45deg);
+    background: linear-gradient(90deg, var(--type-fire), var(--type-electric));
+    color: #1a1a1a;
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    padding: 5px 40px;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.card-private {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.projects-more {
+    display: flex;
+    width: fit-content;
+    margin: var(--space-3xl) auto 0;
+}
+
+/* ----- Project filter tabs ----- */
+.project-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin: calc(var(--space-xl) * -1) auto var(--space-2xl);
+    padding: 6px;
+    width: fit-content;
+    max-width: 100%;
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(8px);
+}
+
+.project-filter {
+    position: relative;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.project-filter:hover,
+.project-filter.active {
+    color: #fff;
+}
+
+.project-filter-pill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--pokedex-red), var(--type-dragon));
+    box-shadow: 0 4px 18px rgba(220, 10, 45, 0.35);
+}
+
+.project-filter-text {
+    position: relative;
+    z-index: 1;
+}
+
+.project-filter-text em {
+    font-style: normal;
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-left: 2px;
+}
+
+/* ----- Skill globe ----- */
+.skill-sphere-wrap {
+    margin: 0 auto var(--space-3xl);
+    text-align: center;
+}
+
+.skill-sphere {
+    position: relative;
+    width: min(520px, 100%);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    perspective: 900px;
+    transform-style: preserve-3d;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.skill-sphere.grabbing {
+    cursor: grabbing;
+}
+
+.skill-sphere-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 38%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.35), transparent 40%),
+        radial-gradient(circle, rgba(112, 56, 248, 0.45), rgba(240, 128, 48, 0.15) 55%, transparent 70%);
+    filter: blur(2px);
+    animation: core-pulse 4s ease-in-out infinite;
+}
+
+@keyframes core-pulse {
+    0%, 100% { scale: 1; opacity: 0.8; }
+    50% { scale: 1.12; opacity: 1; }
+}
+
+.skill-sphere-tag {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    white-space: nowrap;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--tag-color) 70%, white);
+    background: color-mix(in srgb, var(--tag-color) 16%, rgba(10, 14, 39, 0.6));
+    border: 1px solid color-mix(in srgb, var(--tag-color) 55%, transparent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--tag-color) 25%, transparent);
+    will-change: transform, opacity;
+}
+
+[data-theme="day"] .skill-sphere-tag {
+    color: color-mix(in srgb, var(--tag-color) 70%, black);
+    background: color-mix(in srgb, var(--tag-color) 16%, rgba(255, 255, 255, 0.75));
+}
+
+.skill-sphere-hint {
+    margin-top: var(--space-sm);
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+/* ----- Cursor glow ----- */
+.cursor-ring,
+.cursor-dot {
+    position: fixed;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 100000;
+    border-radius: 50%;
+}
+
+.cursor-ring {
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid rgba(248, 208, 48, 0.7);
+    box-shadow: 0 0 18px rgba(248, 208, 48, 0.35), inset 0 0 10px rgba(248, 208, 48, 0.2);
+    transition: width 0.2s, height 0.2s, border-color 0.2s;
+    mix-blend-mode: screen;
+}
+
+.cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--pokedex-light);
+    box-shadow: 0 0 10px var(--pokedex-light);
+}
+
+body:not(.has-cursor-glow) .cursor-ring,
+body:not(.has-cursor-glow) .cursor-dot {
+    display: none;
+}
+
+[data-theme="day"] .cursor-ring {
+    border-color: rgba(224, 64, 112, 0.7);
+    mix-blend-mode: normal;
+}
+
+/* ----- Respect reduced motion ----- */
+@media (prefers-reduced-motion: reduce) {
+    .tilt,
+    .tilt .parallax-sprite {
+        transform: none !important;
+        translate: none !important;
+    }
+    .hero-letter,
+    .skill-sphere-core,
+    .scroll-cue-wheel {
+        animation: none;
+    }
+}
