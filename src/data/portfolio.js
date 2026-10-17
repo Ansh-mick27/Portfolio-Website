@@ -76,9 +76,97 @@ export const skills = [
     },
 ];
 
+// category: "web" | "app" | "tool" | "academic"  (drives the filter tabs)
 export const projects = [
     {
         id: 1,
+        name: "Paradox — AI Mock Interviews",
+        description:
+            "A placement-prep platform with company-specific technical & HR mock interviews powered by real-time AI voice (Gemini Live), online assessments with remote code execution, AI-generated feedback, a candidate dashboard and Razorpay payments.",
+        tech: ["Next.js", "TypeScript", "Gemini Live", "Groq", "Firebase", "Razorpay"],
+        github: "https://github.com/Ansh-mick27/FirstJobsWebsite",
+        live: null,
+        hp: 100,
+        type: "psychic",
+        category: "web",
+        featured: true,
+        attacks: [
+            { name: "Live Voice Interview", damage: 120 },
+            { name: "AI Feedback Beam", damage: 90 },
+        ],
+        pokemon: "alakazam",
+    },
+    {
+        id: 2,
+        name: "CDC Online Test Platform",
+        description:
+            "A zero-cost MCQ exam platform for 200-student campus batches: Excel question upload, email login, shuffled questions, timer with autosave, tab-switch / fullscreen-exit detection with auto-submit, server-side grading and Excel result export.",
+        tech: ["JavaScript", "Supabase", "PostgreSQL", "Python", "GitHub Pages"],
+        github: "https://github.com/Ansh-mick27/cdc-test",
+        live: null,
+        hp: 96,
+        type: "electric",
+        category: "tool",
+        featured: true,
+        attacks: [
+            { name: "Anti-Cheat Shield", damage: 100 },
+            { name: "Server-Side Grade", damage: 80 },
+        ],
+        pokemon: "rotom",
+    },
+    {
+        id: 3,
+        name: "Task Reminder",
+        description:
+            "A Pokémon-themed to-do app that warns you before deadlines — colour-coded urgency (red / yellow / green), push notifications, a morning summary and Google sign-in. Ships as a web app and an Android APK.",
+        tech: ["JavaScript", "Firebase", "Google Auth", "Android"],
+        github: "https://github.com/Ansh-mick27/task-reminder-app",
+        live: "https://task-reminder-f7a06.web.app",
+        hp: 92,
+        type: "grass",
+        category: "app",
+        attacks: [
+            { name: "Deadline Alert", damage: 85 },
+            { name: "Morning Summary", damage: 60 },
+        ],
+        pokemon: "eevee",
+    },
+    {
+        id: 4,
+        name: "DashSheet",
+        description:
+            "A trainer-activity dashboard that turns daily training-session logs, attendance, feedback and work reports into charts — fed live from Google Sheets through an Apps Script JSON API.",
+        tech: ["React", "TypeScript", "Recharts", "Apps Script", "Supabase", "Vercel"],
+        github: "https://github.com/Ansh-mick27/DashSheet",
+        live: null,
+        hp: 90,
+        type: "water",
+        category: "tool",
+        attacks: [
+            { name: "Sheet Sync", damage: 75 },
+            { name: "Chart Storm", damage: 70 },
+        ],
+        pokemon: "porygon",
+    },
+    {
+        id: 5,
+        name: "KRIYETA 5.0",
+        description:
+            "Event website for KRIYETA 5.0 (17–19 April 2026, Indore) — a cyber-security themed competition with rounds, tracks, prizes, rules, sponsors and Unstop registration.",
+        tech: ["React", "TypeScript", "Vite", "CSS"],
+        github: "https://github.com/Ansh-mick27/KriyetaV",
+        live: null,
+        hp: 86,
+        type: "ghost",
+        category: "web",
+        attacks: [
+            { name: "Cyber Shield", damage: 70 },
+            { name: "Track Reveal", damage: 55 },
+        ],
+        pokemon: "gengar",
+    },
+    {
+        id: 6,
         name: "AIIH E-Summit 2026",
         description:
             "A full-featured event management website for the AIIH Foundation's E-Summit. Features event listings, registration, speaker profiles, and dynamic content management with a premium dark-themed design.",
@@ -87,6 +175,7 @@ export const projects = [
         live: "https://aiihesummit2026.vercel.app",
         hp: 95,
         type: "fire",
+        category: "web",
         attacks: [
             { name: "Server Render", damage: 80 },
             { name: "Dynamic Routes", damage: 60 },
@@ -94,23 +183,7 @@ export const projects = [
         pokemon: "charizard",
     },
     {
-        id: 2,
-        name: "Dev's Cricket Club",
-        description:
-            "A modern cricket club website with team management, match schedules, player profiles, and an engaging UI. Built with vanilla JavaScript and deployed on Vercel.",
-        tech: ["JavaScript", "HTML", "CSS", "Vercel"],
-        github: "https://github.com/Ansh-mick27/DevsCricketClub",
-        live: "https://devs-cricket-club.vercel.app",
-        hp: 85,
-        type: "grass",
-        attacks: [
-            { name: "DOM Manipulation", damage: 70 },
-            { name: "Responsive Layout", damage: 55 },
-        ],
-        pokemon: "bulbasaur",
-    },
-    {
-        id: 3,
+        id: 7,
         name: "Travel Requisition",
         description:
             "A cross-platform mobile application built with Expo and React Native for managing travel requests and approvals. Features PostgreSQL database integration and a clean mobile-first design.",
@@ -119,6 +192,7 @@ export const projects = [
         live: null,
         hp: 90,
         type: "water",
+        category: "app",
         attacks: [
             { name: "Cross Platform", damage: 75 },
             { name: "DB Query", damage: 65 },
@@ -126,23 +200,41 @@ export const projects = [
         pokemon: "gyarados",
     },
     {
-        id: 4,
+        id: 8,
+        name: "Dev's Cricket Club",
+        description:
+            "A modern cricket club website with team management, match schedules, player profiles, and an engaging UI. Built with vanilla JavaScript and deployed on Vercel.",
+        tech: ["JavaScript", "HTML", "CSS", "Vercel"],
+        github: "https://github.com/Ansh-mick27/DevsCricketClub",
+        live: "https://devs-cricket-club.vercel.app",
+        hp: 85,
+        type: "grass",
+        category: "web",
+        attacks: [
+            { name: "DOM Manipulation", damage: 70 },
+            { name: "Responsive Layout", damage: 55 },
+        ],
+        pokemon: "bulbasaur",
+    },
+    {
+        id: 9,
         name: "Portfolio Website",
         description:
-            "This very website! A Pokémon-themed portfolio with immersive animations, 3D effects, and a unique trading-card inspired design system.",
-        tech: ["React", "Vite", "Framer Motion", "GSAP"],
+            "This very website! A Pokémon-themed portfolio with a 3D WebGL battle arena, wild Pokémon drifting through 3D space as you scroll, a Tech-Dex skills screen, 3D tilt trading cards and a battle-menu UI.",
+        tech: ["React", "Three.js", "R3F", "Framer Motion", "GSAP"],
         github: "https://github.com/Ansh-mick27/Portfolio-Website",
-        live: null,
+        live: "https://portfolio-website-six-livid-47.vercel.app",
         hp: 100,
         type: "dragon",
+        category: "web",
         attacks: [
+            { name: "3D Warp Field", damage: 110 },
             { name: "Animation Storm", damage: 90 },
-            { name: "Theme Power", damage: 85 },
         ],
         pokemon: "dragonite",
     },
     {
-        id: 5,
+        id: 10,
         name: "InTouch — Social Network",
         description:
             "A social networking site with E-mail facility. A BE project that featured user profiles, messaging, and community features.",
@@ -151,6 +243,7 @@ export const projects = [
         live: null,
         hp: 75,
         type: "psychic",
+        category: "academic",
         attacks: [
             { name: "Social Connect", damage: 60 },
             { name: "Mail Blast", damage: 50 },
@@ -158,7 +251,7 @@ export const projects = [
         pokemon: "mewtwo",
     },
     {
-        id: 6,
+        id: 11,
         name: "Automatic Banking System",
         description:
             "A BE project providing all banking facility through an ATM machine simulation. Features account management, transactions, and balance tracking.",
@@ -167,6 +260,7 @@ export const projects = [
         live: null,
         hp: 70,
         type: "electric",
+        category: "academic",
         attacks: [
             { name: "Transaction Speed", damage: 55 },
             { name: "Secure Auth", damage: 65 },

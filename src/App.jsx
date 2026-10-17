@@ -20,10 +20,14 @@ import EggHatchEasterEgg from './components/EggHatchEasterEgg';
 import TypeParticles from './components/TypeParticles';
 import PokeballTransition from './components/PokeballTransition';
 import PokedexScanEffect from './components/PokedexScanEffect';
+import Background3D from './components/three/Background3D';
+import CursorGlow from './components/fx/CursorGlow';
 
 export default function App() {
     return (
         <SoundManager>
+            <Background3D />
+            <CursorGlow />
             <ScrollProgress />
             <Navbar />
             <FloatingPokemon />

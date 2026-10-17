@@ -44,9 +44,10 @@ export default function PokeballTransition({ children, delay = 0 }) {
 
             {/* Content with fade-in */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={isInView ? { opacity: 1 } : {}}
-                transition={{ duration: 0.5, delay: delay + 0.7 }}
+                initial={{ opacity: 0, rotateX: 14, y: 80, scale: 0.94 }}
+                animate={isInView ? { opacity: 1, rotateX: 0, y: 0, scale: 1 } : {}}
+                transition={{ duration: 0.9, delay: delay + 0.55, ease: [0.22, 1, 0.36, 1] }}
+                style={{ transformPerspective: 1400, transformOrigin: '50% 0%' }}
             >
                 {children}
             </motion.div>
