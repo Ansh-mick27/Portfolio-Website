@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, Sparkles } from '@react-three/drei';
+import { Billboard, Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
 /* ------------------------------------------------------------------
@@ -8,11 +8,11 @@ import * as THREE from 'three';
 ------------------------------------------------------------------- */
 const pointer = { x: 0, y: 0 };
 const scroll = { progress: 0, velocity: 0 };
-const palette = { target: new THREE.Color('#F8D030') };
+const palette = { target: new THREE.Color('#6890F0') };
 
-// Section id → Pokémon type colour the core shifts to while that section is on screen
+// Section id → Pokémon type colour the arena light / aura shifts to
 const SECTION_COLORS = {
-    hero: '#F8D030',
+    hero: '#6890F0',
     about: '#F85888',
     skills: '#F08030',
     projects: '#7038F8',
@@ -24,7 +24,14 @@ const SECTION_COLORS = {
     contact: '#6890F0',
 };
 
-const SHARD_COLORS = ['#F08030', '#6890F0', '#78C850', '#F8D030', '#F85888', '#7038F8', '#98D8D8'];
+const art = (id) => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+// Partner standing on the battle platform, plus three party members orbiting it
+const PARTNER = art(448); // Lucario — the site's mascot
+const PARTY = [art(25), art(6), art(94)]; // Pikachu, Charizard, Gengar
+
+// Wild Pokémon drifting in 3D space down the length of the page
+const WILD = [150, 149, 130, 133, 1, 197, 196, 143, 384, 282, 65, 137, 151, 7, 4, 39];
 
 // How far (world units) the camera travels down while the page scrolls top → bottom
 const TRAVEL = 46;
@@ -37,18 +44,55 @@ function seeded(seed) {
     };
 }
 
+/* ---------------- Sprite texture loader (fails quietly) ---------------- */
+const textureCache = new Map();
+function useSprite(url) {
+    const [tex, setTex] = useState(() => textureCache.get(url) || null);
+    useEffect(() => {
+        if (textureCache.has(url)) return setTex(textureCache.get(url));
+        let alive = true;
+        const loader = new THREE.TextureLoader();
+        loader.setCrossOrigin('anonymous');
+        loader.load(
+            url,
+            (t) => {
+                t.colorSpace = THREE.SRGBColorSpace;
+                t.anisotropy = 4;
+                textureCache.set(url, t);
+                if (alive) setTex(t);
+            },
+            undefined,
+            () => {} // offline / blocked → just don't show the sprite
+        );
+        return () => {
+            alive = false;
+        };
+    }, [url]);
+    return tex;
+}
+
+function Sprite({ url, size = 1, opacity = 1, ...props }) {
+    const tex = useSprite(url);
+    if (!tex) return null;
+    return (
+        <Billboard {...props}>
+            <mesh>
+                <planeGeometry args={[size, size]} />
+                <meshBasicMaterial map={tex} transparent opacity={opacity} alphaTest={0.05} depthWrite={false} toneMapped={false} />
+            </mesh>
+        </Billboard>
+    );
+}
+
 /* ---------------- Camera rig: scroll dolly + mouse parallax ---------------- */
 function CameraRig() {
     const { camera } = useThree();
     const look = useMemo(() => new THREE.Vector3(), []);
     useFrame((_, dt) => {
-        const k = 1 - Math.pow(0.001, dt);
         const targetY = -scroll.progress * TRAVEL;
-        camera.position.x += (pointer.x * 1.2 - camera.position.x) * k * 0.6;
-        camera.position.y += (targetY + pointer.y * 0.8 - camera.position.y) * k;
-        // slight barrel-roll when scrolling fast
-        camera.rotation.z += (-scroll.velocity * 0.0009 - camera.rotation.z) * k;
-        look.set(0, camera.position.y - pointer.y * 0.4, -6);
+        camera.position.x = THREE.MathUtils.damp(camera.position.x, pointer.x * 0.9, 2.5, dt);
+        camera.position.y = THREE.MathUtils.damp(camera.position.y, targetY + pointer.y * 0.6, 5, dt);
+        look.set(0, camera.position.y - pointer.y * 0.3, -6);
         camera.lookAt(look);
     });
     return null;
@@ -76,7 +120,7 @@ function Starfield({ count, night }) {
         groups.current.forEach((g, i) => {
             if (!g) return;
             g.rotation.z += dt * layers[i].speed;
-            g.scale.y = THREE.MathUtils.damp(g.scale.y, warp, 5, dt); // stretch stars into streaks on fast scroll
+            g.scale.y = THREE.MathUtils.damp(g.scale.y, warp, 5, dt); // streaks on fast scroll
             g.position.y = state.camera.position.y * (0.15 * (i + 1));
         });
     });
@@ -99,139 +143,131 @@ function Starfield({ count, night }) {
     ));
 }
 
-/* ---------------- The energy core: distorted orb + shell + orbit rings ---------------- */
-function EnergyCore({ isMobile, night }) {
-    const group = useRef();
-    const orb = useRef();
-    const mat = useRef();
-    const shell = useRef();
+/* ---------------- Hero: 3D battle arena with partner Pokémon ---------------- */
+function BattleArena({ isMobile, night }) {
+    const root = useRef();
+    const partner = useRef();
+    const shadow = useRef();
+    const glowMats = useRef([]);
+    const light = useRef();
     const rings = useRef([]);
     const moons = useRef([]);
-    const light = useRef();
-    const color = useMemo(() => new THREE.Color('#F8D030'), []);
+    const color = useMemo(() => new THREE.Color('#6890F0'), []);
 
     const ringDefs = useMemo(
         () => [
-            { r: 2.15, tilt: [1.2, 0.2, 0], speed: 0.6 },
-            { r: 2.55, tilt: [0.4, 1.1, 0.3], speed: -0.45 },
-            { r: 2.95, tilt: [1.7, -0.6, 0.8], speed: 0.32 },
+            { r: 2.3, tilt: [1.35, 0.15, 0], speed: 0.55, y: 0.6 },
+            { r: 2.75, tilt: [1.15, -0.35, 0.25], speed: -0.4, y: 0.9 },
+            { r: 3.15, tilt: [1.5, 0.45, -0.3], speed: 0.3, y: 0.4 },
         ],
         []
     );
 
     useFrame((state, dt) => {
         const t = state.clock.elapsedTime;
-        const p = scroll.progress;
         color.lerp(palette.target, 1 - Math.exp(-2.5 * dt));
-
-        if (mat.current) {
-            mat.current.color.copy(color);
-            mat.current.emissive.copy(color).multiplyScalar(night ? 0.28 : 0.18);
-            mat.current.distort = 0.24 + Math.sin(t * 0.8) * 0.06 + Math.min(Math.abs(scroll.velocity) * 0.002, 0.25);
-        }
+        glowMats.current.forEach((m) => m && m.color.copy(color));
         if (light.current) light.current.color.copy(color);
 
-        if (group.current) {
-            // Path: starts right of the hero text, then weaves left/right behind content
-            const heroX = isMobile ? 0 : 3.3;
-            const weave = Math.sin(p * Math.PI * 4) * (isMobile ? 1.2 : 4.2);
-            const x = p < 0.08 ? THREE.MathUtils.lerp(heroX, weave, p / 0.08) : weave;
-            const camY = state.camera.position.y;
-            group.current.position.x = THREE.MathUtils.damp(group.current.position.x, x, 3.5, dt);
-            group.current.position.y = camY + (isMobile ? 2.6 : 0) * (1 - Math.min(p * 10, 1)) + Math.sin(t * 0.9) * 0.15;
-            const targetZ = p < 0.06 ? -1 : -6.5;
-            group.current.position.z = THREE.MathUtils.damp(group.current.position.z, targetZ, 3, dt);
-            const s = isMobile ? 0.42 : 0.78;
-            group.current.scale.setScalar(s);
-            group.current.rotation.y = t * 0.15 + pointer.x * 0.5;
-            group.current.rotation.x = pointer.y * 0.3;
+        if (root.current) {
+            root.current.rotation.y = THREE.MathUtils.damp(root.current.rotation.y, pointer.x * 0.35, 3, dt);
+            root.current.rotation.x = THREE.MathUtils.damp(root.current.rotation.x, -pointer.y * 0.08, 3, dt);
         }
-        if (orb.current) orb.current.rotation.y += dt * 0.25;
-        if (shell.current) {
-            shell.current.rotation.x -= dt * 0.12;
-            shell.current.rotation.y -= dt * 0.18;
-            shell.current.material.color.copy(color);
+        if (partner.current) {
+            // idle "battle stance" bob + breathing squash
+            const bob = Math.abs(Math.sin(t * 2.2)) * 0.18;
+            partner.current.position.y = 1.15 + bob;
+            partner.current.scale.set(1 + Math.sin(t * 4.4) * 0.012, 1 - Math.sin(t * 4.4) * 0.012, 1);
         }
-        rings.current.forEach((r, i) => {
-            if (!r) return;
-            r.rotation.z += dt * ringDefs[i].speed;
-            r.children[0].material.color.copy(color);
-        });
+        if (shadow.current) shadow.current.scale.setScalar(1 - Math.abs(Math.sin(t * 2.2)) * 0.12);
+
+        rings.current.forEach((r, i) => r && (r.rotation.z += dt * ringDefs[i].speed));
         moons.current.forEach((m, i) => {
             if (!m) return;
-            const def = ringDefs[i % 3];
-            const a = t * (0.7 + i * 0.13) + i * 2.1;
-            m.position.set(Math.cos(a) * def.r, Math.sin(a) * def.r, 0);
+            const d = ringDefs[i];
+            const a = t * (0.5 + i * 0.12) + i * 2.1;
+            m.position.set(Math.cos(a) * d.r, Math.sin(a) * d.r, 0);
         });
     });
 
+    const x = isMobile ? 0 : 3.2;
+    const y = isMobile ? 2.2 : -0.2;
+    const s = isMobile ? 0.5 : 0.85;
+
     return (
-        <group ref={group} position={[isMobile ? 0 : 3.3, 0, -1]}>
-            <pointLight ref={light} intensity={night ? 30 : 18} distance={14} />
-            <mesh ref={orb}>
-                <icosahedronGeometry args={[1.25, 12]} />
-                <MeshDistortMaterial
-                    ref={mat}
-                    speed={2.2}
-                    distort={0.38}
-                    roughness={0.22}
-                    metalness={0.85}
-                    emissiveIntensity={1}
-                />
-            </mesh>
-            <mesh ref={shell} scale={1.65}>
-                <icosahedronGeometry args={[1, 1]} />
-                <meshBasicMaterial wireframe transparent opacity={0.22} />
-            </mesh>
+        <group ref={root} position={[x, y, -1]} scale={s}>
+            <pointLight ref={light} position={[0, 1.5, 1.5]} intensity={night ? 25 : 14} distance={10} />
+
+            {/* Battle platform */}
+            <group position={[0, -1, 0]}>
+                <mesh position={[0, -0.12, 0]}>
+                    <cylinderGeometry args={[2.2, 2.35, 0.25, 64]} />
+                    <meshStandardMaterial color={night ? '#2f5d2a' : '#5f9c4f'} roughness={0.85} />
+                </mesh>
+                <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <circleGeometry args={[2.2, 64]} />
+                    <meshStandardMaterial color={night ? '#4e8f3f' : '#86c46e'} roughness={0.9} />
+                </mesh>
+                {/* arena markings */}
+                {[2.05, 1.25].map((r, i) => (
+                    <mesh key={r} position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                        <ringGeometry args={[r - 0.05, r, 64]} />
+                        <meshBasicMaterial ref={(m) => (glowMats.current[i] = m)} transparent opacity={0.85} toneMapped={false} />
+                    </mesh>
+                ))}
+                <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <planeGeometry args={[4.1, 0.05]} />
+                    <meshBasicMaterial ref={(m) => (glowMats.current[2] = m)} transparent opacity={0.6} toneMapped={false} />
+                </mesh>
+                <mesh ref={shadow} position={[0, 0.03, 0.1]} rotation={[-Math.PI / 2, 0, 0]}>
+                    <circleGeometry args={[0.95, 40]} />
+                    <meshBasicMaterial color="#000" transparent opacity={0.35} depthWrite={false} />
+                </mesh>
+            </group>
+
+            {/* Partner Pokémon */}
+            <group ref={partner} position={[0, 1.15, 0.1]}>
+                <Sprite url={PARTNER} size={3.2} />
+            </group>
+
+            {/* Aura */}
+            <Sparkles count={isMobile ? 30 : 70} scale={[3.5, 3.5, 2]} position={[0, 1.2, 0]} size={3} speed={0.6} color="#7fb2ff" opacity={0.9} />
+
+            {/* Party orbiting the arena */}
             {ringDefs.map((d, i) => (
-                <group key={i} rotation={d.tilt} ref={(el) => (rings.current[i] = el)}>
+                <group key={i} position={[0, d.y, 0]} rotation={d.tilt} ref={(el) => (rings.current[i] = el)}>
                     <mesh>
                         <torusGeometry args={[d.r, 0.012, 8, 160]} />
-                        <meshBasicMaterial transparent opacity={0.55} />
+                        <meshBasicMaterial ref={(m) => (glowMats.current[3 + i] = m)} transparent opacity={0.45} toneMapped={false} />
                     </mesh>
-                    <mesh ref={(el) => (moons.current[i] = el)}>
-                        <sphereGeometry args={[0.07, 16, 16]} />
-                        <meshBasicMaterial color="#ffffff" />
-                    </mesh>
+                    <group ref={(el) => (moons.current[i] = el)}>
+                        <Sprite url={PARTY[i]} size={0.95} />
+                    </group>
                 </group>
             ))}
-            <Sparkles count={isMobile ? 25 : 60} scale={5} size={2.2} speed={0.5} opacity={0.7} />
         </group>
     );
 }
 
-/* ---------------- Crystal shards spread down the whole page ---------------- */
-function Shards({ count }) {
+/* ---------------- Wild Pokémon drifting through 3D space below the hero ---------------- */
+function WildPokemon({ count }) {
     const items = useMemo(() => {
         const rand = seeded(42);
-        return Array.from({ length: count }, (_, i) => {
+        return WILD.slice(0, count).map((id, i) => {
             const side = i % 2 === 0 ? 1 : -1;
             return {
-                pos: [side * (3.5 + rand() * 4.5), 4 - (i / count) * (TRAVEL + 8) + rand() * 2, -3 - rand() * 7],
-                rot: [rand() * Math.PI, rand() * Math.PI, 0],
-                scale: 0.25 + rand() * 0.55,
-                color: SHARD_COLORS[i % SHARD_COLORS.length],
-                geo: i % 3,
-                speed: 0.6 + rand() * 1.4,
+                url: art(id),
+                pos: [side * (4.2 + rand() * 3.5), -5 - (i / count) * (TRAVEL - 2) + rand() * 2, -4 - rand() * 6],
+                size: 1.6 + rand() * 1.4,
+                speed: 0.8 + rand() * 1.2,
+                opacity: 0.4 + rand() * 0.25,
             };
         });
     }, [count]);
 
-    return items.map((s, i) => (
-        <Float key={i} speed={s.speed} rotationIntensity={1.6} floatIntensity={1.4} position={s.pos}>
-            <mesh rotation={s.rot} scale={s.scale}>
-                {s.geo === 0 && <octahedronGeometry args={[1, 0]} />}
-                {s.geo === 1 && <tetrahedronGeometry args={[1, 0]} />}
-                {s.geo === 2 && <dodecahedronGeometry args={[0.85, 0]} />}
-                <meshStandardMaterial
-                    color={s.color}
-                    emissive={s.color}
-                    emissiveIntensity={0.25}
-                    metalness={0.7}
-                    roughness={0.18}
-                    flatShading
-                />
-            </mesh>
+    return items.map((p, i) => (
+        <Float key={i} speed={p.speed} rotationIntensity={0.25} floatIntensity={1.6} position={p.pos}>
+            <Sprite url={p.url} size={p.size} opacity={p.opacity} />
         </Float>
     ));
 }
@@ -253,12 +289,10 @@ export default function Scene3D({ night = true }) {
             const max = document.documentElement.scrollHeight - window.innerHeight;
             scroll.progress = max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0;
             const now = performance.now();
-            const v = ((window.scrollY - lastY) / Math.max(now - lastT, 1)) * 16;
-            scroll.velocity = v;
+            scroll.velocity = ((window.scrollY - lastY) / Math.max(now - lastT, 1)) * 16;
             lastY = window.scrollY;
             lastT = now;
         };
-        // velocity decays when scrolling stops
         const decay = setInterval(() => {
             scroll.velocity *= 0.85;
         }, 50);
@@ -296,13 +330,12 @@ export default function Scene3D({ night = true }) {
                 camera={{ position: [0, 0, 7], fov: 50, near: 0.1, far: 120 }}
                 gl={{ antialias: !isMobile, alpha: true, powerPreference: 'high-performance' }}
             >
-                <ambientLight intensity={night ? 0.35 : 0.8} />
-                <directionalLight position={[5, 6, 4]} intensity={night ? 1.2 : 1.6} />
-                <pointLight position={[-6, -4, 2]} intensity={12} color="#7038F8" distance={20} />
+                <ambientLight intensity={night ? 0.55 : 0.95} />
+                <directionalLight position={[3, 6, 5]} intensity={night ? 1.4 : 1.8} />
                 <CameraRig />
                 <Starfield count={isMobile ? 900 : 2400} night={night} />
-                <EnergyCore isMobile={isMobile} night={night} />
-                <Shards count={isMobile ? 10 : 22} />
+                <BattleArena isMobile={isMobile} night={night} />
+                <WildPokemon count={isMobile ? 8 : 16} />
             </Canvas>
         </div>
     );

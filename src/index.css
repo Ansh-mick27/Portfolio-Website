@@ -3154,9 +3154,6 @@ main,
     -webkit-backdrop-filter: blur(8px);
 }
 
-.hero-stage .hero-buttons {
-    justify-content: flex-start;
-}
 
 .hero-name.split {
     background: none;
@@ -3249,9 +3246,6 @@ main,
     }
     .hero-stage .rpg-textbox {
         margin-left: auto;
-    }
-    .hero-stage .hero-buttons {
-        justify-content: center;
     }
 }
 
@@ -3422,78 +3416,6 @@ main,
     margin-left: 2px;
 }
 
-/* ----- Skill globe ----- */
-.skill-sphere-wrap {
-    margin: 0 auto var(--space-3xl);
-    text-align: center;
-}
-
-.skill-sphere {
-    position: relative;
-    width: min(520px, 100%);
-    aspect-ratio: 1;
-    margin: 0 auto;
-    perspective: 900px;
-    transform-style: preserve-3d;
-    cursor: grab;
-    touch-action: pan-y;
-    user-select: none;
-}
-
-.skill-sphere.grabbing {
-    cursor: grabbing;
-}
-
-.skill-sphere-core {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 38%;
-    aspect-ratio: 1;
-    translate: -50% -50%;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.35), transparent 40%),
-        radial-gradient(circle, rgba(112, 56, 248, 0.45), rgba(240, 128, 48, 0.15) 55%, transparent 70%);
-    filter: blur(2px);
-    animation: core-pulse 4s ease-in-out infinite;
-}
-
-@keyframes core-pulse {
-    0%, 100% { scale: 1; opacity: 0.8; }
-    50% { scale: 1.12; opacity: 1; }
-}
-
-.skill-sphere-tag {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    white-space: nowrap;
-    padding: 5px 12px;
-    border-radius: var(--radius-full);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: color-mix(in srgb, var(--tag-color) 70%, white);
-    background: color-mix(in srgb, var(--tag-color) 16%, rgba(10, 14, 39, 0.6));
-    border: 1px solid color-mix(in srgb, var(--tag-color) 55%, transparent);
-    box-shadow: 0 0 14px color-mix(in srgb, var(--tag-color) 25%, transparent);
-    will-change: transform, opacity;
-}
-
-[data-theme="day"] .skill-sphere-tag {
-    color: color-mix(in srgb, var(--tag-color) 70%, black);
-    background: color-mix(in srgb, var(--tag-color) 16%, rgba(255, 255, 255, 0.75));
-}
-
-.skill-sphere-hint {
-    margin-top: var(--space-sm);
-    font-family: var(--font-pixel);
-    font-size: 0.5rem;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-}
-
 /* ----- Cursor glow ----- */
 .cursor-ring,
 .cursor-dot {
@@ -3541,6 +3463,527 @@ body:not(.has-cursor-glow) .cursor-dot {
     .hero-letter,
     .skill-sphere-core,
     .scroll-cue-wheel {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   POKÉMON BATTLE HERO
+   ============================================================ */
+
+/* Encounter wipe on load */
+.battle-intro-wipe {
+    position: fixed;
+    inset: 0;
+    z-index: 100001;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wipe-bar {
+    flex: 1;
+    background: #0a0a12;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.wipe-flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+}
+
+/* Opponent-style status box next to the 3D arena */
+.battle-hud {
+    position: absolute;
+    top: 13%;
+    right: 26%;
+    z-index: 11;
+    width: 270px;
+    padding: 12px 16px 10px;
+    background: var(--bg-card);
+    border: 3px solid rgba(255, 255, 255, 0.85);
+    border-radius: 14px 4px 14px 4px;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.35), 0 0 30px rgba(104, 144, 240, 0.25);
+    font-family: var(--font-pixel);
+    backdrop-filter: blur(8px);
+}
+
+.battle-hud-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.battle-hud-lv {
+    font-size: 0.6rem;
+    color: var(--type-electric);
+}
+
+.battle-hud-hp,
+.battle-hud-exp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.5rem;
+    color: var(--type-electric);
+}
+
+.battle-hud-bar {
+    flex: 1;
+    height: 9px;
+    border-radius: 6px;
+    background: #222;
+    border: 2px solid #444;
+    overflow: hidden;
+}
+
+.battle-hud-fill {
+    height: 100%;
+    background: linear-gradient(180deg, #7dff8d, #2ecc71);
+}
+
+.battle-hud-types {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0 6px;
+}
+
+.battle-hud-types .type-badge {
+    font-size: 0.45rem;
+    padding: 3px 8px;
+}
+
+.battle-hud-exp {
+    color: #6fc3ff;
+}
+
+.battle-hud-expbar {
+    flex: 1;
+    height: 4px;
+    background: #222;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.battle-hud-expfill {
+    height: 100%;
+    background: #3fa9ff;
+}
+
+[data-theme="day"] .battle-hud {
+    border-color: rgba(44, 30, 74, 0.6);
+}
+
+/* "What will ANSHUL do?" command menu */
+.battle-menu {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    max-width: 600px;
+    background: var(--bg-card);
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+}
+
+.battle-menu-prompt {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    font-family: var(--font-pixel);
+    font-size: 0.62rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    border-right: 3px solid rgba(255, 255, 255, 0.12);
+}
+
+.battle-menu-prompt strong {
+    color: var(--type-electric);
+    font-weight: normal;
+}
+
+.battle-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px;
+}
+
+.battle-cmd {
+    --cmd: var(--type-fire);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 10px 10px 26px;
+    border-radius: 8px;
+    text-decoration: none;
+    background: color-mix(in srgb, var(--cmd) 14%, transparent);
+    border: 2px solid color-mix(in srgb, var(--cmd) 45%, transparent);
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s ease;
+}
+
+.battle-cmd.fire { --cmd: var(--type-fire); }
+.battle-cmd.electric { --cmd: var(--type-electric); }
+.battle-cmd.grass { --cmd: var(--type-grass); }
+.battle-cmd.water { --cmd: var(--type-water); }
+
+.battle-cmd-label {
+    font-family: var(--font-pixel);
+    font-size: 0.68rem;
+    color: var(--text-primary);
+}
+
+.battle-cmd-sub {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.battle-cmd-arrow {
+    position: absolute;
+    left: 9px;
+    top: 11px;
+    font-size: 0.6rem;
+    color: var(--cmd);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+.battle-cmd:hover,
+.battle-cmd:focus-visible {
+    background: color-mix(in srgb, var(--cmd) 28%, transparent);
+    border-color: var(--cmd);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--cmd) 40%, transparent);
+    outline: none;
+}
+
+.battle-cmd:hover .battle-cmd-arrow,
+.battle-cmd:focus-visible .battle-cmd-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    animation: rpg-text-blink 0.8s infinite;
+}
+
+@media (max-width: 1100px) {
+    .battle-hud { display: none; }
+}
+
+@media (max-width: 768px) {
+    .battle-menu {
+        grid-template-columns: 1fr;
+        margin: 0 auto;
+        text-align: left;
+    }
+    .battle-menu-prompt {
+        border-right: none;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.12);
+        padding: 12px 14px;
+    }
+}
+
+/* ============================================================
+   TECH-DEX (skills)
+   ============================================================ */
+.techdex {
+    --dex-color: var(--type-fire);
+    margin-bottom: var(--space-4xl);
+}
+
+.techdex-types {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: var(--space-xl);
+}
+
+.techdex-type {
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 6px 14px;
+    opacity: 0.55;
+    transform: translateY(0);
+    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.techdex-type:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.techdex-type.active {
+    opacity: 1;
+    border-color: #fff;
+    transform: translateY(-3px) scale(1.08);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--dex-color) 55%, transparent);
+}
+
+.techdex-frame {
+    max-width: 980px;
+    transition: box-shadow 0.5s ease;
+    box-shadow: var(--shadow-lg), 0 0 70px color-mix(in srgb, var(--dex-color) 30%, transparent);
+}
+
+.techdex-frame .pokedex-lights {
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.techdex-label {
+    margin-left: auto;
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+.techdex-body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--space-xl);
+}
+
+.techdex-screen {
+    position: relative;
+    min-height: 340px;
+    border-radius: var(--radius-md);
+    border: 3px solid #1a1f4a;
+    background:
+        radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--dex-color) 35%, transparent), transparent 62%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 4px),
+        #0d1117;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 700px;
+    transition: background 0.5s ease;
+}
+
+.techdex-scanline {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: color-mix(in srgb, var(--dex-color) 70%, transparent);
+    box-shadow: 0 0 14px var(--dex-color);
+    animation: scan-line 2.6s linear infinite;
+    z-index: 3;
+    opacity: 0.6;
+}
+
+.techdex-ring {
+    position: absolute;
+    width: 72%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px dashed color-mix(in srgb, var(--dex-color) 60%, transparent);
+    animation: dex-ring 12s linear infinite;
+    transform: rotateX(70deg);
+    top: 52%;
+}
+
+@keyframes dex-ring {
+    to { transform: rotateX(70deg) rotateZ(360deg); }
+}
+
+.techdex-sprite {
+    position: relative;
+    z-index: 2;
+    width: 68%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+    animation: dex-hover 3.2s ease-in-out infinite;
+}
+
+@keyframes dex-hover {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -10px; }
+}
+
+.techdex-id {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+    z-index: 4;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    color: #7dff8d;
+    text-shadow: 0 0 8px rgba(125, 255, 141, 0.6);
+}
+
+.techdex-moves {
+    background: #0d1117;
+    border: 3px solid #1a1f4a;
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    perspective: 800px;
+}
+
+.techdex-moves-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.techdex-moves-head h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: #f0f0f0;
+}
+
+.techdex-moves-sub {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: #6b73a0;
+    margin: 10px 0 14px;
+    letter-spacing: 1px;
+}
+
+.techdex-list {
+    list-style: none;
+    display: grid;
+    gap: 7px;
+}
+
+.techdex-list li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--dex-color) 10%, rgba(255, 255, 255, 0.02));
+    border-left: 4px solid var(--dex-color);
+    transform-origin: 50% 0;
+    transition: background 0.2s, translate 0.2s;
+}
+
+.techdex-list li:hover {
+    background: color-mix(in srgb, var(--dex-color) 22%, rgba(255, 255, 255, 0.04));
+    translate: 6px 0;
+}
+
+.techdex-tm {
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--dex-color);
+}
+
+.techdex-move {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #f0f0f0;
+    font-size: 0.95rem;
+}
+
+/* little spinning TM disc */
+.techdex-disc {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #0d1117 0 22%, var(--dex-color) 24% 60%, color-mix(in srgb, var(--dex-color) 50%, #fff) 62% 100%);
+    animation: disc-spin 2.5s linear infinite;
+}
+
+@keyframes disc-spin {
+    to { transform: rotateY(360deg); }
+}
+
+.techdex-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.techdex-controls button {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: none;
+    background: #222;
+    color: #ddd;
+    cursor: pointer;
+    box-shadow: inset 0 -3px 0 #000, 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.1s, background 0.2s;
+}
+
+.techdex-controls button:hover {
+    background: var(--dex-color);
+    color: #111;
+}
+
+.techdex-controls button:active {
+    transform: translateY(2px);
+}
+
+.techdex-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.techdex-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.techdex-dots span.on {
+    background: var(--dex-color);
+    transform: scale(1.4);
+    box-shadow: 0 0 8px var(--dex-color);
+}
+
+.type-chart-title {
+    font-family: var(--font-pixel);
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+.skill-tm {
+    font-family: var(--font-pixel);
+    font-size: 0.42rem;
+    opacity: 0.6;
+    margin-right: 2px;
+}
+
+@media (max-width: 768px) {
+    .techdex-body {
+        grid-template-columns: 1fr;
+    }
+    .techdex-screen {
+        min-height: 260px;
+    }
+    .techdex-frame .pokedex-inner {
+        padding: var(--space-lg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .techdex-ring,
+    .techdex-sprite,
+    .techdex-disc,
+    .techdex-scanline {
         animation: none;
     }
 }

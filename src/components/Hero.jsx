@@ -3,6 +3,86 @@ import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'fram
 import { personalInfo } from '../data/portfolio';
 import useMagnetic from './fx/useMagnetic';
 
+const COMMANDS = [
+    { label: 'FIGHT', sub: 'Projects', href: '#projects', type: 'fire' },
+    { label: 'BAG', sub: 'Tech moves', href: '#skills', type: 'electric' },
+    { label: 'POKéMON', sub: 'Journey', href: '#experience', type: 'grass' },
+    { label: 'RUN', sub: 'Contact', href: '#contact', type: 'water' },
+];
+
+function BattleIntro() {
+    // Classic encounter wipe: stripes slide away to reveal the battle
+    const [done, setDone] = useState(false);
+    useEffect(() => {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const t = setTimeout(() => setDone(true), reduce ? 0 : 1500);
+        return () => clearTimeout(t);
+    }, []);
+    if (done) return null;
+    return (
+        <div className="battle-intro-wipe" aria-hidden="true">
+            {Array.from({ length: 8 }).map((_, i) => (
+                <motion.span
+                    key={i}
+                    className="wipe-bar"
+                    initial={{ x: '0%' }}
+                    animate={{ x: i % 2 ? '105%' : '-105%' }}
+                    transition={{ delay: 0.25 + i * 0.05, duration: 0.55, ease: [0.7, 0, 0.3, 1] }}
+                />
+            ))}
+            <motion.span
+                className="wipe-flash"
+                initial={{ opacity: 0.9 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+            />
+        </div>
+    );
+}
+
+function BattleHud() {
+    return (
+        <motion.div
+            className="battle-hud"
+            initial={{ x: 120, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            aria-hidden="true"
+        >
+            <div className="battle-hud-top">
+                <span className="battle-hud-name">LUCARIO ♂</span>
+                <span className="battle-hud-lv">Lv99</span>
+            </div>
+            <div className="battle-hud-hp">
+                <span>HP</span>
+                <div className="battle-hud-bar">
+                    <motion.div
+                        className="battle-hud-fill"
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{ delay: 1.7, duration: 1.1, ease: 'easeOut' }}
+                    />
+                </div>
+            </div>
+            <div className="battle-hud-types">
+                <span className="type-badge fighting">Fighting</span>
+                <span className="type-badge steel">Steel</span>
+            </div>
+            <div className="battle-hud-exp">
+                <span>EXP</span>
+                <div className="battle-hud-expbar">
+                    <motion.div
+                        className="battle-hud-expfill"
+                        initial={{ width: '0%' }}
+                        animate={{ width: '82%' }}
+                        transition={{ delay: 2.2, duration: 1.2 }}
+                    />
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
 function SplitName({ text }) {
     return (
         <h1 className="hero-name split" aria-label={text}>
@@ -31,8 +111,8 @@ export default function Hero() {
     const [roleIndex, setRoleIndex] = useState(0);
     const [displayText, setDisplayText] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
-    const primaryBtn = useMagnetic(0.3);
-    const secondaryBtn = useMagnetic(0.3);
+    const primaryBtn = useMagnetic(0.12);
+    const secondaryBtn = useMagnetic(0.12);
 
     // Typing effect
     useEffect(() => {
@@ -92,9 +172,11 @@ export default function Hero() {
                 my.set(0);
             }}
         >
+            <BattleIntro />
             <div className="hero-bg">
                 <div className="stars" />
             </div>
+            <BattleHud />
 
             <motion.div className="hero-stage" style={{ z: sinkZ, rotateX: sinkRot, opacity: sinkOpacity }}>
                 <motion.div className="hero-content" style={{ rotateX: rx, rotateY: ry }}>
@@ -120,14 +202,29 @@ export default function Hero() {
                             <p>{personalInfo.bio}</p>
                         </motion.div>
 
-                        <motion.div className="hero-buttons" variants={fadeUp}>
-                            <a ref={primaryBtn} className="pokeball-btn magnetic" href="#projects">
-                                🎴 View Projects
-                            </a>
-                            <a ref={secondaryBtn} className="pokeball-btn secondary magnetic" href="#contact">
-                                📬 Contact Me
-                            </a>
-                        </motion.div>
+                        <motion.nav className="battle-menu" variants={fadeUp} aria-label="Quick navigation">
+                            <p className="battle-menu-prompt">
+                                <span>
+                                What will{' '}
+                                <strong>{personalInfo.name.split(' ')[0].toUpperCase()}</strong>{' '}
+                                do?
+                                </span>
+                            </p>
+                            <div className="battle-menu-grid">
+                                {COMMANDS.map((c, i) => (
+                                    <a
+                                        key={c.label}
+                                        ref={i === 0 ? primaryBtn : i === 3 ? secondaryBtn : undefined}
+                                        href={c.href}
+                                        className={`battle-cmd ${c.type}`}
+                                    >
+                                        <span className="battle-cmd-arrow" aria-hidden="true">▶</span>
+                                        <span className="battle-cmd-label">{c.label}</span>
+                                        <span className="battle-cmd-sub">{c.sub}</span>
+                                    </a>
+                                ))}
+                            </div>
+                        </motion.nav>
                     </motion.div>
                 </motion.div>
             </motion.div>

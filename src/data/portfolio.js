@@ -220,7 +220,7 @@ export const projects = [
         id: 9,
         name: "Portfolio Website",
         description:
-            "This very website! A Pokémon-themed portfolio with a WebGL 3D scene that reacts to scroll and mouse, 3D tilt cards, a spinning skill globe and a trading-card inspired design system.",
+            "This very website! A Pokémon-themed portfolio with a 3D WebGL battle arena, wild Pokémon drifting through 3D space as you scroll, a Tech-Dex skills screen, 3D tilt trading cards and a battle-menu UI.",
         tech: ["React", "Three.js", "R3F", "Framer Motion", "GSAP"],
         github: "https://github.com/Ansh-mick27/Portfolio-Website",
         live: "https://portfolio-website-six-livid-47.vercel.app",
